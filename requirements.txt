@@ -1,5 +1,7 @@
 fastapi
 uvicorn[standard]
-joblib
 pandas
+joblib
 scikit-learn
+xgboost
+shap

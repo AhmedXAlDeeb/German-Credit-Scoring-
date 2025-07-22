@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Credit Scoring Predictor</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, select { margin-bottom: 10px; width: 300px; padding: 5px; }
+    button { padding: 8px 16px; }
+    .result { margin-top: 20px; background: #f5f5f5; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <h2>Creditworthiness Prediction</h2>
+
+  <form id="creditForm">
+    <label>Duration:</label><br>
+    <input type="number" name="Duration" step="1" required><br>
+
+    <label>Credit Amount:</label><br>
+    <input type="number" name="Credit_amount" step="1" required><br>
+
+    <label>Installment Rate:</label><br>
+    <input type="number" name="Installment_rate_in_percentage_of_disposable_income" step="1" required><br>
+
+    <label>Present Residence Since:</label><br>
+    <input type="number" name="Present_residence_since" step="1" required><br>
+
+    <label>Age:</label><br>
+    <input type="number" name="Age" step="1" required><br>
+
+    <label>Number of Existing Credits:</label><br>
+    <input type="number" name="Number_of_existing_credits_at_this_bank" step="1" required><br>
+
+    <label>People Liable for Maintenance:</label><br>
+    <input type="number" name="Number_of_people_being_liable_to_provide_maintenance_for" step="1" required><br>
+
+    <!-- Categorical Inputs -->
+    <label>Checking Status:</label><br>
+    <input type="text" name="checking_status_string"><br>
+
+    <label>Credit History:</label><br>
+    <input type="text" name="credit_history_string"><br>
+
+    <label>Purpose:</label><br>
+    <input type="text" name="purpose_string"><br>
+
+    <label>Savings:</label><br>
+    <input type="text" name="savings_string"><br>
+
+    <label>Employment:</label><br>
+    <input type="text" name="employment_string"><br>
+
+    <label>Other Guarantors:</label><br>
+    <input type="text" name="other_guarantors_string"><br>
+
+    <label>Property:</label><br>
+    <input type="text" name="property_string"><br>
+
+    <label>Other Installments:</label><br>
+    <input type="text" name="other_installment_string"><br>
+
+    <label>Housing:</label><br>
+    <input type="text" name="housing_string"><br>
+
+    <label>Job:</label><br>
+    <input type="text" name="job_string"><br>
+
+    <label>Gender:</label><br>
+    <input type="text" name="gender"><br>
+
+    <label>Marital Status:</label><br>
+    <input type="text" name="marital_status"><br>
+
+    <label>Has Guarantor:</label><br>
+    <input type="text" name="has_guarantor"><br>
+
+    <label>Is Unemployed:</label><br>
+    <input type="text" name="is_unemployed"><br>
+
+    <label>Has Telephone:</label><br>
+    <input type="text" name="has_telephone"><br>
+
+    <label>Is Foreign:</label><br>
+    <input type="text" name="is_foreign"><br>
+
+    <label>Has Other Debts:</label><br>
+    <input type="text" name="has_other_debts"><br>
+
+    <button type="submit">Predict</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    document.getElementById("creditForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+
+      const response = await fetch("http://localhost:8000/predict_with_explanation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      document.getElementById("result").innerHTML = `
+        <h3>Result</h3>
+        <strong>Prediction Probability:</strong> ${result.prediction_probability} <br>
+        <strong>Explanation:</strong> ${result.explanation_summary} <br>
+        <strong>Top Contributions:</strong>
+        <ul>
+          ${result.top_feature_contributions.map(([k, v]) => `<li>${k}: ${v.toFixed(3)}</li>`).join('')}
+        </ul>
+      `;
+    });
+  </script>
+
+</body>
+</html>
